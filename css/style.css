@@ -1,0 +1,209 @@
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Variables ──────────────────────────────────────────────────────────── */
+/* Warm, light, friendly on purpose -- this is a gift for a non-technical
+   user, not a dev tool. Deliberately not Anvil's dark theme. No web fonts
+   either: system-ui only, so there's nothing to fetch and nothing that fails
+   to load offline. */
+:root {
+  --bg: #FBF3EA;
+  --surface: #FFFFFF;
+  --surface-2: #FDF0E4;
+  --border: #EAD9C7;
+  --accent: #E8734A;
+  --accent-dim: rgba(232, 115, 74, 0.12);
+  --text: #3A2E27;
+  --text-2: #8A7A6D;
+  --text-3: #C9B8A8;
+  --radius: 16px;
+  --radius-sm: 12px;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+.view {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 18px 48px;
+  min-height: 100dvh;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.page-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.page-sub {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+/* ─── Add form ───────────────────────────────────────────────────────────── */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 17px;
+  padding: 15px 16px;
+}
+.form-input:focus { outline: none; border-color: var(--accent); }
+.form-input::placeholder { color: var(--text-3); }
+
+.form-error {
+  color: #B84A3A;
+  font-size: 14px;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+.btn:active { opacity: 0.75; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 10px 2px;
+  margin-top: 6px;
+}
+.link-btn:active { opacity: 0.7; }
+
+/* ─── Task list ──────────────────────────────────────────────────────────── */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.task-check {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  cursor: pointer;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.task-check svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.task-card.done .task-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.task-card.done .task-check svg { opacity: 1; }
+
+.task-body { flex: 1; min-width: 0; }
+
+.task-title {
+  font-size: 17px;
+  font-weight: 600;
+  word-break: break-word;
+}
+.task-card.done .task-title {
+  color: var(--text-2);
+  text-decoration: line-through;
+}
+
+.task-note {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-top: 3px;
+  word-break: break-word;
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-3);
+  font-size: 15px;
+}
+
+/* ─── Utility ────────────────────────────────────────────────────────────── */
+.hidden { display: none; }
