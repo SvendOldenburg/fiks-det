@@ -1,4 +1,4 @@
-import { listTasks, addTask, setTaskDone } from './api.js';
+import { listTasks, addTask, setTaskDone, deleteTask } from './api.js';
 
 const form = document.getElementById('add-form');
 const titleInput = document.getElementById('task-title');
@@ -11,8 +11,12 @@ const toggleDoneBtn = document.getElementById('toggle-done');
 
 let tasks = [];
 let doneVisible = false;
+let confirmingId = null;  // task awaiting "really delete?", one at a time
 
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg>';
+const TRASH_SVG = '<svg viewBox="0 0 24 24"><polyline points="4 7 20 7"/>' +
+  '<path d="M9.5 7V5.5A1.5 1.5 0 0 1 11 4h2a1.5 1.5 0 0 1 1.5 1.5V7"/>' +
+  '<path d="M6.5 7l.85 12.15A1.5 1.5 0 0 0 8.85 20.5h6.3a1.5 1.5 0 0 0 1.5-1.35L17.5 7"/></svg>';
 
 function escapeHtml(s) {
   const div = document.createElement('div');
@@ -21,6 +25,8 @@ function escapeHtml(s) {
 }
 
 function taskCardHtml(task) {
+  if (task.id === confirmingId) return confirmCardHtml(task);
+
   const doneClass = task.done ? ' done' : '';
   const note = task.note ? `<div class="task-note">${escapeHtml(task.note)}</div>` : '';
   const label = task.done ? 'Marker som ikke klar' : 'Marker som klar';
@@ -30,6 +36,24 @@ function taskCardHtml(task) {
       <div class="task-body">
         <div class="task-title">${escapeHtml(task.title)}</div>
         ${note}
+      </div>
+      <button class="task-delete" type="button" data-action="ask-delete" aria-label="Slet opgave">${TRASH_SVG}</button>
+    </div>
+  `;
+}
+
+// The card replaces itself with the confirm step rather than opening a dialog,
+// so the question sits exactly where the task is and can't be mistaken for a
+// question about a different one.
+function confirmCardHtml(task) {
+  return `
+    <div class="task-card confirming" data-id="${task.id}">
+      <div class="task-body">
+        <div class="task-title">Slet "${escapeHtml(task.title)}"?</div>
+        <div class="confirm-actions">
+          <button class="btn-cancel" type="button" data-action="cancel-delete">Fortryd</button>
+          <button class="btn-confirm" type="button" data-action="confirm-delete">Slet</button>
+        </div>
       </div>
     </div>
   `;
@@ -58,9 +82,24 @@ async function load() {
   taskList.innerHTML = '<div class="empty-state">Henter...</div>';
   try {
     tasks = await listTasks();
+    confirmingId = null;
     render();
   } catch (err) {
     taskList.innerHTML = '<div class="empty-state">Kunne ikke hente listen. Tjek din forbindelse og prøv igen.</div>';
+  }
+}
+
+async function removeTask(id) {
+  const idx = tasks.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const [removed] = tasks.splice(idx, 1); // optimistic, put back below on failure
+  confirmingId = null;
+  render();
+  try {
+    await deleteTask(id);
+  } catch (err) {
+    tasks.splice(idx, 0, removed);
+    render();
   }
 }
 
@@ -90,6 +129,7 @@ form.addEventListener('submit', async (e) => {
     tasks.unshift(created);
     titleInput.value = '';
     noteInput.value = '';
+    confirmingId = null;  // don't leave a stale confirm open behind the new task
     render();
   } catch (err) {
     addError.textContent = 'Kunne ikke gemme opgaven. Prøv igen.';
@@ -102,10 +142,20 @@ form.addEventListener('submit', async (e) => {
 
 for (const list of [taskList, doneList]) {
   list.addEventListener('click', (e) => {
-    const btn = e.target.closest('.task-check');
-    if (!btn) return;
-    const card = btn.closest('.task-card');
-    toggleTask(card.dataset.id);
+    const card = e.target.closest('.task-card');
+    if (!card) return;
+    const id = card.dataset.id;
+
+    const action = e.target.closest('[data-action]');
+    if (action) {
+      if (action.dataset.action === 'ask-delete') confirmingId = id;
+      else if (action.dataset.action === 'cancel-delete') confirmingId = null;
+      else if (action.dataset.action === 'confirm-delete') return removeTask(id);
+      render();
+      return;
+    }
+
+    if (e.target.closest('.task-check')) toggleTask(id);
   });
 }
 

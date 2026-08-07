@@ -2,7 +2,7 @@
 // never cached here). Bump CACHE on any frontend change -- without it,
 // returning visitors keep the old shell. (Anvil learned this the hard way:
 // its cache sat stale for 3 months across a full data-layer rewrite.)
-const CACHE = 'fiksdet-v1';
+const CACHE = 'fiksdet-v2';
 const SHELL = [
   './',
   './index.html',

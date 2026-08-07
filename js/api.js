@@ -26,9 +26,14 @@ async function pbReq(method, path, body) {
 // collection is affected, we just don't rely on server-side sort at all --
 // fetch and sort client-side on the `created` field every record already
 // carries in its JSON body. Simpler, and immune to the issue either way.
+// Soft-deleted records are filtered out here rather than with a PB `filter=`
+// query, for the same reason the sort is client-side: the list is a handful
+// of records, so there's no reason to depend on server-side query syntax.
 export async function listTasks() {
   const r = await pbReq('GET', `${BASE}?perPage=500`);
-  return r.items.sort((a, b) => new Date(b.created) - new Date(a.created));
+  return r.items
+    .filter(t => !t.deleted)
+    .sort((a, b) => new Date(b.created) - new Date(a.created));
 }
 
 export async function addTask(title, note) {
@@ -37,4 +42,13 @@ export async function addTask(title, note) {
 
 export async function setTaskDone(id, done) {
   return pbReq('PATCH', `${BASE}/${id}`, { done });
+}
+
+// Delete is soft on purpose: this flips a flag via the (open) update rule
+// instead of issuing a DELETE. The collection's delete rule stays
+// superuser-only, so nothing reachable from this app -- or from a stranger
+// who finds the URL -- can actually destroy a record, and a mis-tap is
+// recoverable from the PocketBase admin UI.
+export async function deleteTask(id) {
+  return pbReq('PATCH', `${BASE}/${id}`, { deleted: true });
 }

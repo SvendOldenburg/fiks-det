@@ -11,20 +11,22 @@ body {
 }
 
 /* ─── Variables ──────────────────────────────────────────────────────────── */
-/* Warm, light, friendly on purpose -- this is a gift for a non-technical
-   user, not a dev tool. Deliberately not Anvil's dark theme. No web fonts
-   either: system-ui only, so there's nothing to fetch and nothing that fails
-   to load offline. */
+/* Light and friendly on purpose -- this is a gift for a non-technical user,
+   not a dev tool. Deliberately not Anvil's dark theme. No web fonts either:
+   system-ui only, so there's nothing to fetch and nothing that fails to load
+   offline. Cobalt accent; the neutrals carry a matching cool tint so the
+   surfaces read as one palette rather than leftovers from the old warm one. */
 :root {
-  --bg: #FBF3EA;
+  --bg: #F5F8FD;
   --surface: #FFFFFF;
-  --surface-2: #FDF0E4;
-  --border: #EAD9C7;
-  --accent: #E8734A;
-  --accent-dim: rgba(232, 115, 74, 0.12);
-  --text: #3A2E27;
-  --text-2: #8A7A6D;
-  --text-3: #C9B8A8;
+  --surface-2: #EDF2FA;
+  --border: #D6E0EF;
+  --accent: #0047AB;
+  --accent-dim: rgba(0, 71, 171, 0.12);
+  --danger: #C0392B;
+  --text: #1E293B;
+  --text-2: #6B7A90;
+  --text-3: #A8B6C9;
   --radius: 16px;
   --radius-sm: 12px;
 }
@@ -52,10 +54,12 @@ body {
   flex-shrink: 0;
 }
 
+/* Set in caps, so it wants positive tracking -- the tight negative tracking
+   that suited "Fiks det" makes "FIKS DET" look cramped. */
 .page-title {
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.045em;
 }
 
 .page-sub {
@@ -86,7 +90,7 @@ body {
 .form-input::placeholder { color: var(--text-3); }
 
 .form-error {
-  color: #B84A3A;
+  color: var(--danger);
   font-size: 14px;
 }
 
@@ -195,6 +199,67 @@ body {
   font-size: 14px;
   margin-top: 3px;
   word-break: break-word;
+}
+
+/* ─── Delete ─────────────────────────────────────────────────────────────── */
+/* Quiet until touched: the bin sits in --text-3 so it never competes with the
+   task itself, and only goes red once it's actually being pressed. */
+.task-delete {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  margin: -3px -6px 0 0;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  color: var(--text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.task-delete svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.task-delete:active { color: var(--danger); }
+
+/* Confirm step, inline in the card rather than a native confirm() dialog --
+   it keeps the copy in Danish and under our control, and reads as part of
+   the app instead of a browser interruption. */
+.task-card.confirming { border-color: var(--danger); }
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 13px;
+}
+.confirm-actions button {
+  flex: 1;
+  padding: 13px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.confirm-actions button:active { opacity: 0.75; }
+
+.btn-confirm { background: var(--danger); color: #fff; }
+.btn-cancel {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 /* ─── Empty state ────────────────────────────────────────────────────────── */

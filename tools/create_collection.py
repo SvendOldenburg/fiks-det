@@ -46,6 +46,9 @@ def main():
             {"type": "text", "name": "title", "required": True, "presentable": True},
             {"type": "text", "name": "note"},
             {"type": "bool", "name": "done"},
+            # Soft-delete flag. The app's delete button sets this instead of
+            # issuing a DELETE, which is what lets deleteRule stay superuser-only.
+            {"type": "bool", "name": "deleted"},
         ] + autodates(),
         "indexes": [],
         **RULES,

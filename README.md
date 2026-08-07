@@ -1,4 +1,4 @@
-# Fiks det
+# FIKS DET
 
 A birthday gift for Svo's mom: a one-screen list where she logs things in
 her apartment that need fixing, so the family can show up together and work
@@ -24,8 +24,9 @@ PWA) keep the old shell.
 ## Collection
 
 `fiksdet_tasks` -- `title` (text, required), `note` (text, optional),
-`done` (bool). Prefixed and distinctive on purpose, to stay clear of
-Anvil's seven unprefixed collections and `vessel_*` / `lumen_*` / `meeple_*`.
+`done` (bool), `deleted` (bool, soft-delete flag -- see below). Prefixed and
+distinctive on purpose, to stay clear of Anvil's seven unprefixed collections
+and `vessel_*` / `lumen_*` / `meeple_*`.
 
 ## Why the rules are open
 
@@ -41,8 +42,21 @@ Anyone who found that URL could read the list or add clutter to it.
 
 `deleteRule` is `null` (superuser-only) as the one piece of defense-in-depth
 this doesn't give up: nobody, including a stranger who stumbles on the URL,
-can wipe the list from the app itself. The app's UI has no delete button to
-match.
+can wipe the list from the app itself.
+
+### Delete is soft
+
+The list does have a delete button, and it does **not** issue a `DELETE`. It
+PATCHes `deleted = true` through the open update rule, and `js/api.js` filters
+those records out when it loads the list. Two things fall out of that:
+
+- `deleteRule` stays superuser-only, so nothing reachable from the app can
+  actually destroy a record.
+- A mis-tap is recoverable. Records never leave the database -- flip `deleted`
+  back to false in the PocketBase admin UI and the task reappears.
+
+The UI asks for confirmation inline in the card before deleting, since mom
+can't undo it herself from the app.
 
 ## Gotchas
 
@@ -57,10 +71,11 @@ match.
 ## Tools
 
 ```
-python tools/gen_icons.py         # regenerate icons/ (pure stdlib, no deps)
-python tools/create_collection.py # create fiksdet_tasks if missing (idempotent)
-python tools/set_rules.py         # re-assert the rules above (idempotent)
-python tools/verify_access.py     # prove they hold
+python tools/gen_icons.py          # regenerate icons/ (pure stdlib, no deps)
+python tools/create_collection.py  # create fiksdet_tasks if missing (idempotent)
+python tools/add_deleted_field.py  # backfill the `deleted` flag on an older collection
+python tools/set_rules.py          # re-assert the rules above (idempotent)
+python tools/verify_access.py      # prove they hold
 ```
 
 Copy `tools/.env.example` to `tools/.env` first (needs a PocketBase superuser
