@@ -9,6 +9,9 @@ const taskList = document.getElementById('task-list');
 const doneList = document.getElementById('done-list');
 const toggleDoneBtn = document.getElementById('toggle-done');
 const addPriority = document.getElementById('add-priority');
+const undoBar = document.getElementById('undo-bar');
+const undoText = document.getElementById('undo-text');
+const undoBtn = document.getElementById('undo-btn');
 
 let tasks = [];
 let doneVisible = false;
@@ -185,12 +188,31 @@ addPriority.addEventListener('click', (e) => {
   if (btn) setNewPriority(Number(btn.dataset.prio));
 });
 
-async function toggleTask(id) {
+// Marking a task done moves it out of sight into the hidden "afsluttede"
+// list. Mom tapped three circles by accident and her list looked "locked"
+// (the tasks she expected at the top were simply gone). So every finish
+// gets a few seconds of "Fortryd" at the bottom of the screen.
+let undoTimer = null;
+function offerUndo(task) {
+  clearTimeout(undoTimer);
+  undoText.textContent = `"${task.title}" er klaret`;
+  undoBtn.onclick = () => { hideUndo(); toggleTask(task.id, true); };
+  undoBar.classList.remove('hidden');
+  undoTimer = setTimeout(hideUndo, 7000);
+}
+function hideUndo() {
+  clearTimeout(undoTimer);
+  undoBar.classList.add('hidden');
+}
+
+async function toggleTask(id, fromUndo = false) {
   const task = tasks.find(t => t.id === id);
   if (!task) return;
   const next = !task.done;
   task.done = next; // optimistic update, reverted below on failure
   render();
+  if (next) offerUndo(task);
+  else if (fromUndo) revealCard(id);
   try {
     await setTaskDone(id, next);
   } catch (err) {
