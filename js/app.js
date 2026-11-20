@@ -17,11 +17,12 @@ let prioritizingId = null;  // task with its priority picker open, one at a time
 let newPriority = 0;  // what the add form's picker is set to
 
 const PRIORITIES = [
-  { value: 1, label: 'Haster', cls: 'high' },
+  { value: 1, label: '1. Prioritet', cls: 'p1' },
+  { value: 2, label: '2. Prioritet', cls: 'p2' },
+  { value: 3, label: '3. Prioritet', cls: 'p3' },
   { value: 0, label: 'Normal', cls: 'normal' },
-  { value: -1, label: 'Kan vente', cls: 'low' },
 ];
-const prioOf = (task) => PRIORITIES.find(p => p.value === (task.priority || 0)) || PRIORITIES[1];
+const prioOf = (task) => PRIORITIES.find(p => p.value === (task.priority || 0)) || PRIORITIES[3];
 
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg>';
 const TRASH_SVG = '<svg viewBox="0 0 24 24"><polyline points="4 7 20 7"/>' +

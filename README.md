@@ -25,8 +25,8 @@ PWA) keep the old shell.
 
 `fiksdet_tasks` -- `title` (text, required), `note` (text, optional),
 `done` (bool), `deleted` (bool, soft-delete flag -- see below), `priority`
-(int: 1 = Haster, 0 = Normal, -1 = Kan vente; missing reads as 0). The list
-sorts by priority, then newest first. Prefixed and
+(int: 1/2/3 = 1./2./3. Prioritet, 0 = Normal; missing reads as 0). The list
+sorts 1, 2, 3, Normal, then newest first. Prefixed and
 distinctive on purpose, to stay clear of Anvil's seven unprefixed collections
 and `vessel_*` / `lumen_*` / `meeple_*`.
 

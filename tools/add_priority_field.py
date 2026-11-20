@@ -3,7 +3,7 @@
 
     python tools/add_priority_field.py
 
-Priority is a whole number: 1 = Haster, 0 = Normal, -1 = Kan vente. Existing
+Priority is a whole number: 1, 2, 3 = 1./2./3. Prioritet, 0 = Normal. Existing
 records read as 0 (PocketBase numbers are 0 when absent), so every task
 already on the list lands in Normal. Safe to run against the live list.
 
@@ -14,7 +14,7 @@ like it saved a priority and then lose it on the next reload.
 
 from pb import connect
 
-FIELD = {"type": "number", "name": "priority", "onlyInt": True, "min": -1, "max": 1}
+FIELD = {"type": "number", "name": "priority", "onlyInt": True, "min": 0, "max": 3}
 
 
 def main():

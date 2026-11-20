@@ -30,9 +30,10 @@
       <input class="form-input" type="text" id="task-title" placeholder="Hvad skal fikses?" autocomplete="off" required>
       <input class="form-input" type="text" id="task-note" placeholder="Detaljer (valgfrit)" autocomplete="off">
       <div class="prio-picker" id="add-priority" role="radiogroup" aria-label="Hvor vigtigt er det?">
-        <button type="button" class="prio-opt" data-prio="1" role="radio" aria-checked="false">Haster</button>
+        <button type="button" class="prio-opt" data-prio="1" role="radio" aria-checked="false">1. Prioritet</button>
+        <button type="button" class="prio-opt" data-prio="2" role="radio" aria-checked="false">2. Prioritet</button>
+        <button type="button" class="prio-opt" data-prio="3" role="radio" aria-checked="false">3. Prioritet</button>
         <button type="button" class="prio-opt selected" data-prio="0" role="radio" aria-checked="true">Normal</button>
-        <button type="button" class="prio-opt" data-prio="-1" role="radio" aria-checked="false">Kan vente</button>
       </div>
       <button class="btn btn-primary" type="submit" id="add-btn">Tilføj</button>
       <p id="add-error" class="form-error hidden"></p>

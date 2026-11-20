@@ -274,11 +274,17 @@ body {
 .hidden { display: none; }
 
 /* ─── Priority ───────────────────────────────────────────────────────────── */
-/* Three levels, not drag-to-reorder: a big tap target beats a fiddly drag on
-   a phone, and "Haster / Normal / Kan vente" is how she'd say it out loud.
-   Haster gets a red edge so urgent things stand out at a glance. */
-.task-card.prio-high { border-left: 5px solid var(--danger); padding-left: 12px; }
-.task-card.prio-low .task-title { color: var(--text-2); }
+/* Four levels: 1./2./3. Prioritet and Normal. Not drag-to-reorder: a big tap
+   target beats a fiddly drag on a phone. Prioritised tasks get a coloured
+   left edge (red, orange, cobalt) so the order reads at a glance. */
+:root { --p1: #C0392B; --p2: #C2610C; --p3: #0047AB; }
+.task-card.prio-p1, .task-card.prio-p2, .task-card.prio-p3 {
+  border-left-width: 5px;
+  padding-left: 12px;
+}
+.task-card.prio-p1 { border-left-color: var(--p1); }
+.task-card.prio-p2 { border-left-color: var(--p2); }
+.task-card.prio-p3 { border-left-color: var(--p3); }
 
 .prio-chip {
   display: inline-block;
@@ -296,19 +302,17 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .prio-chip:active { opacity: 0.7; }
-.prio-chip.high {
-  background: rgba(192, 57, 43, 0.1);
-  border-color: rgba(192, 57, 43, 0.35);
-  color: var(--danger);
-}
-.prio-chip.low { color: var(--text-3); background: none; }
+.prio-chip.p1 { color: var(--p1); background: rgba(192, 57, 43, 0.1); border-color: rgba(192, 57, 43, 0.35); }
+.prio-chip.p2 { color: var(--p2); background: rgba(194, 97, 12, 0.1); border-color: rgba(194, 97, 12, 0.35); }
+.prio-chip.p3 { color: var(--p3); background: var(--accent-dim); border-color: rgba(0, 71, 171, 0.3); }
 
+/* 2x2 grid: four "1. Prioritet"-length labels don't fit in one row on a phone. */
 .prio-picker {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 .prio-opt {
-  flex: 1;
   padding: 13px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
@@ -322,12 +326,11 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .prio-opt:active { opacity: 0.75; }
-.prio-opt.selected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-.prio-opt.selected[data-prio="1"] { background: var(--danger); border-color: var(--danger); }
+.prio-opt.selected { color: #fff; background: var(--accent); border-color: var(--accent); }
+.prio-opt.selected[data-prio="1"] { background: var(--p1); border-color: var(--p1); }
+.prio-opt.selected[data-prio="2"] { background: var(--p2); border-color: var(--p2); }
+.prio-opt.selected[data-prio="3"] { background: var(--p3); border-color: var(--p3); }
+.prio-opt.selected[data-prio="0"] { background: var(--text-2); border-color: var(--text-2); }
 
 .task-card.choosing { border-color: var(--accent); }
 .task-card.choosing .prio-picker { margin-top: 8px; }
