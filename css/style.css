@@ -272,3 +272,67 @@ body {
 
 /* ─── Utility ────────────────────────────────────────────────────────────── */
 .hidden { display: none; }
+
+/* ─── Priority ───────────────────────────────────────────────────────────── */
+/* Three levels, not drag-to-reorder: a big tap target beats a fiddly drag on
+   a phone, and "Haster / Normal / Kan vente" is how she'd say it out loud.
+   Haster gets a red edge so urgent things stand out at a glance. */
+.task-card.prio-high { border-left: 5px solid var(--danger); padding-left: 12px; }
+.task-card.prio-low .task-title { color: var(--text-2); }
+
+.prio-chip {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.prio-chip:active { opacity: 0.7; }
+.prio-chip.high {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: rgba(192, 57, 43, 0.35);
+  color: var(--danger);
+}
+.prio-chip.low { color: var(--text-3); background: none; }
+
+.prio-picker {
+  display: flex;
+  gap: 8px;
+}
+.prio-opt {
+  flex: 1;
+  padding: 13px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.prio-opt:active { opacity: 0.75; }
+.prio-opt.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.prio-opt.selected[data-prio="1"] { background: var(--danger); border-color: var(--danger); }
+
+.task-card.choosing { border-color: var(--accent); }
+.task-card.choosing .prio-picker { margin-top: 8px; }
+.choose-label {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-top: 10px;
+}

@@ -24,7 +24,9 @@ PWA) keep the old shell.
 ## Collection
 
 `fiksdet_tasks` -- `title` (text, required), `note` (text, optional),
-`done` (bool), `deleted` (bool, soft-delete flag -- see below). Prefixed and
+`done` (bool), `deleted` (bool, soft-delete flag -- see below), `priority`
+(int: 1 = Haster, 0 = Normal, -1 = Kan vente; missing reads as 0). The list
+sorts by priority, then newest first. Prefixed and
 distinctive on purpose, to stay clear of Anvil's seven unprefixed collections
 and `vessel_*` / `lumen_*` / `meeple_*`.
 
@@ -74,6 +76,7 @@ can't undo it herself from the app.
 python tools/gen_icons.py          # regenerate icons/ (pure stdlib, no deps)
 python tools/create_collection.py  # create fiksdet_tasks if missing (idempotent)
 python tools/add_deleted_field.py  # backfill the `deleted` flag on an older collection
+python tools/add_priority_field.py # add the `priority` field (run before deploying it)
 python tools/set_rules.py          # re-assert the rules above (idempotent)
 python tools/verify_access.py      # prove they hold
 ```

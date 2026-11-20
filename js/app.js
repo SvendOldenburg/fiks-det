@@ -1,4 +1,4 @@
-import { listTasks, addTask, setTaskDone, deleteTask } from './api.js';
+import { listTasks, addTask, setTaskDone, deleteTask, setTaskPriority, sortTasks } from './api.js';
 
 const form = document.getElementById('add-form');
 const titleInput = document.getElementById('task-title');
@@ -8,10 +8,20 @@ const addError = document.getElementById('add-error');
 const taskList = document.getElementById('task-list');
 const doneList = document.getElementById('done-list');
 const toggleDoneBtn = document.getElementById('toggle-done');
+const addPriority = document.getElementById('add-priority');
 
 let tasks = [];
 let doneVisible = false;
 let confirmingId = null;  // task awaiting "really delete?", one at a time
+let prioritizingId = null;  // task with its priority picker open, one at a time
+let newPriority = 0;  // what the add form's picker is set to
+
+const PRIORITIES = [
+  { value: 1, label: 'Haster', cls: 'high' },
+  { value: 0, label: 'Normal', cls: 'normal' },
+  { value: -1, label: 'Kan vente', cls: 'low' },
+];
+const prioOf = (task) => PRIORITIES.find(p => p.value === (task.priority || 0)) || PRIORITIES[1];
 
 const CHECK_SVG = '<svg viewBox="0 0 24 24"><polyline points="5 13 10 18 19 7"/></svg>';
 const TRASH_SVG = '<svg viewBox="0 0 24 24"><polyline points="4 7 20 7"/>' +
@@ -26,16 +36,23 @@ function escapeHtml(s) {
 
 function taskCardHtml(task) {
   if (task.id === confirmingId) return confirmCardHtml(task);
+  if (task.id === prioritizingId && !task.done) return priorityCardHtml(task);
 
   const doneClass = task.done ? ' done' : '';
+  const prio = prioOf(task);
+  const prioClass = task.done ? '' : ` prio-${prio.cls}`;
+  // Finished tasks don't need a priority, so the chip only shows on open ones.
+  const chip = task.done ? '' :
+    `<button class="prio-chip ${prio.cls}" type="button" data-action="ask-priority" aria-label="Prioritet: ${prio.label}. Tryk for at ændre">${prio.label}</button>`;
   const note = task.note ? `<div class="task-note">${escapeHtml(task.note)}</div>` : '';
   const label = task.done ? 'Marker som ikke klar' : 'Marker som klar';
   return `
-    <div class="task-card${doneClass}" data-id="${task.id}">
+    <div class="task-card${doneClass}${prioClass}" data-id="${task.id}">
       <button class="task-check" type="button" aria-label="${label}">${CHECK_SVG}</button>
       <div class="task-body">
         <div class="task-title">${escapeHtml(task.title)}</div>
         ${note}
+        ${chip}
       </div>
       <button class="task-delete" type="button" data-action="ask-delete" aria-label="Slet opgave">${TRASH_SVG}</button>
     </div>
@@ -54,6 +71,25 @@ function confirmCardHtml(task) {
           <button class="btn-cancel" type="button" data-action="cancel-delete">Fortryd</button>
           <button class="btn-confirm" type="button" data-action="confirm-delete">Slet</button>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+// Same pattern as the delete confirm: the card itself turns into the picker,
+// so it's obvious which task is being changed.
+function priorityCardHtml(task) {
+  const current = task.priority || 0;
+  const opts = PRIORITIES.map(p => `
+    <button type="button" class="prio-opt${p.value === current ? ' selected' : ''}"
+      data-action="set-priority" data-prio="${p.value}">${p.label}</button>`).join('');
+  return `
+    <div class="task-card choosing" data-id="${task.id}">
+      <div class="task-body">
+        <div class="task-title">${escapeHtml(task.title)}</div>
+        <div class="choose-label">Hvor vigtigt er det?</div>
+        <div class="prio-picker">${opts}</div>
+        <button class="link-btn" type="button" data-action="cancel-priority">Fortryd</button>
       </div>
     </div>
   `;
@@ -83,6 +119,7 @@ async function load() {
   try {
     tasks = await listTasks();
     confirmingId = null;
+    prioritizingId = null;
     render();
   } catch (err) {
     taskList.innerHTML = '<div class="empty-state">Kunne ikke hente listen. Tjek din forbindelse og prøv igen.</div>';
@@ -102,6 +139,37 @@ async function removeTask(id) {
     render();
   }
 }
+
+async function changePriority(id, priority) {
+  const task = tasks.find(t => t.id === id);
+  prioritizingId = null;
+  if (!task || (task.priority || 0) === priority) return render();
+  const prev = task.priority || 0;
+  task.priority = priority; // optimistic, reverted below on failure
+  sortTasks(tasks);
+  render();
+  try {
+    await setTaskPriority(id, priority);
+  } catch (err) {
+    task.priority = prev;
+    sortTasks(tasks);
+    render();
+  }
+}
+
+function setNewPriority(value) {
+  newPriority = value;
+  for (const btn of addPriority.querySelectorAll('.prio-opt')) {
+    const on = Number(btn.dataset.prio) === value;
+    btn.classList.toggle('selected', on);
+    btn.setAttribute('aria-checked', on);
+  }
+}
+
+addPriority.addEventListener('click', (e) => {
+  const btn = e.target.closest('.prio-opt');
+  if (btn) setNewPriority(Number(btn.dataset.prio));
+});
 
 async function toggleTask(id) {
   const task = tasks.find(t => t.id === id);
@@ -125,11 +193,14 @@ form.addEventListener('submit', async (e) => {
   addError.classList.add('hidden');
   addBtn.disabled = true;
   try {
-    const created = await addTask(title, noteInput.value.trim());
+    const created = await addTask(title, noteInput.value.trim(), newPriority);
     tasks.unshift(created);
+    sortTasks(tasks);
     titleInput.value = '';
     noteInput.value = '';
+    setNewPriority(0);
     confirmingId = null;  // don't leave a stale confirm open behind the new task
+    prioritizingId = null;
     render();
   } catch (err) {
     addError.textContent = 'Kunne ikke gemme opgaven. Prøv igen.';
@@ -148,9 +219,13 @@ for (const list of [taskList, doneList]) {
 
     const action = e.target.closest('[data-action]');
     if (action) {
-      if (action.dataset.action === 'ask-delete') confirmingId = id;
-      else if (action.dataset.action === 'cancel-delete') confirmingId = null;
-      else if (action.dataset.action === 'confirm-delete') return removeTask(id);
+      const a = action.dataset.action;
+      if (a === 'ask-delete') { confirmingId = id; prioritizingId = null; }
+      else if (a === 'cancel-delete') confirmingId = null;
+      else if (a === 'confirm-delete') return removeTask(id);
+      else if (a === 'ask-priority') { prioritizingId = id; confirmingId = null; }
+      else if (a === 'cancel-priority') prioritizingId = null;
+      else if (a === 'set-priority') return changePriority(id, Number(action.dataset.prio));
       render();
       return;
     }

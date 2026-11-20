@@ -49,6 +49,8 @@ def main():
             # Soft-delete flag. The app's delete button sets this instead of
             # issuing a DELETE, which is what lets deleteRule stay superuser-only.
             {"type": "bool", "name": "deleted"},
+            # 1 = Haster, 0 = Normal, -1 = Kan vente. See js/api.js.
+            {"type": "number", "name": "priority", "onlyInt": True, "min": -1, "max": 1},
         ] + autodates(),
         "indexes": [],
         **RULES,

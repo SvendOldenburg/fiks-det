@@ -29,15 +29,24 @@ async function pbReq(method, path, body) {
 // Soft-deleted records are filtered out here rather than with a PB `filter=`
 // query, for the same reason the sort is client-side: the list is a handful
 // of records, so there's no reason to depend on server-side query syntax.
+// Priority is a number: 1 = Haster, 0 = Normal, -1 = Kan vente. Records
+// created before the field existed read as 0 (PocketBase numbers default to
+// 0), so they all land in Normal without a backfill. Highest priority first,
+// newest first within each level.
+export const sortTasks = (list) => list.sort((a, b) =>
+  (b.priority || 0) - (a.priority || 0) || new Date(b.created) - new Date(a.created));
+
 export async function listTasks() {
   const r = await pbReq('GET', `${BASE}?perPage=500`);
-  return r.items
-    .filter(t => !t.deleted)
-    .sort((a, b) => new Date(b.created) - new Date(a.created));
+  return sortTasks(r.items.filter(t => !t.deleted));
 }
 
-export async function addTask(title, note) {
-  return pbReq('POST', BASE, { title, note: note || '', done: false });
+export async function addTask(title, note, priority = 0) {
+  return pbReq('POST', BASE, { title, note: note || '', done: false, priority });
+}
+
+export async function setTaskPriority(id, priority) {
+  return pbReq('PATCH', `${BASE}/${id}`, { priority });
 }
 
 export async function setTaskDone(id, done) {
