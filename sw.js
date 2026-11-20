@@ -2,7 +2,7 @@
 // never cached here). Bump CACHE on any frontend change -- without it,
 // returning visitors keep the old shell. (Anvil learned this the hard way:
 // its cache sat stale for 3 months across a full data-layer rewrite.)
-const CACHE = 'fiksdet-v3';
+const CACHE = 'fiksdet-v4';
 const SHELL = [
   './',
   './index.html',
@@ -20,7 +20,11 @@ const SHELL = [
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())
+    // cache: 'reload' skips the browser's HTTP cache (GitHub Pages serves
+    // max-age=600), so a new version can't be stored half old, half new.
+    caches.open(CACHE)
+      .then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
   );
 });
 

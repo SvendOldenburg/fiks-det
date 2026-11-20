@@ -149,6 +149,7 @@ async function changePriority(id, priority) {
   task.priority = priority; // optimistic, reverted below on failure
   sortTasks(tasks);
   render();
+  revealCard(id);
   try {
     await setTaskPriority(id, priority);
   } catch (err) {
@@ -156,6 +157,18 @@ async function changePriority(id, priority) {
     sortTasks(tasks);
     render();
   }
+}
+
+// A new priority re-sorts the list, so the task usually jumps somewhere
+// off-screen and she's left looking at the wrong part of the list (mom's
+// first report: "can't get away from it, can't see the top tasks"). Follow
+// the card to its new spot and flash it so it's obvious where it went.
+function revealCard(id) {
+  const card = taskList.querySelector(`[data-id="${id}"]`);
+  if (!card) return;
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.add('just-moved');
+  setTimeout(() => card.classList.remove('just-moved'), 1600);
 }
 
 function setNewPriority(value) {

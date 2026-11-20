@@ -332,6 +332,13 @@ body {
 .prio-opt.selected[data-prio="3"] { background: var(--p3); border-color: var(--p3); }
 .prio-opt.selected[data-prio="0"] { background: var(--text-2); border-color: var(--text-2); }
 
+/* Flash after a priority change, so the card is easy to spot in its new place. */
+@keyframes moved-flash {
+  0%, 40% { box-shadow: 0 0 0 4px var(--accent-dim); background: #EAF1FC; }
+  100% { box-shadow: 0 0 0 0 transparent; background: var(--surface); }
+}
+.task-card.just-moved { animation: moved-flash 1.6s ease-out; }
+
 .task-card.choosing { border-color: var(--accent); }
 .task-card.choosing .prio-picker { margin-top: 8px; }
 .choose-label {
