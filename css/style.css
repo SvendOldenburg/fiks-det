@@ -380,3 +380,21 @@ body {
   font-size: 14px;
   margin-top: 10px;
 }
+
+/* ─── Oversigt (read-only mirror) ────────────────────────────────────────── */
+.mirror-summary { color: var(--text-2); font-size: 15px; margin: 0 0 14px; }
+.mirror-mark {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.mirror-mark.checked { background: var(--accent); border-color: var(--accent); }
+.mirror-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+.mirror-meta .prio-chip { margin-top: 9px; }
+.prio-chip.static { cursor: default; }
+.mirror-date { margin-top: 9px; font-size: 13px; color: var(--text-3); }
+.mirror-updated { color: var(--text-3); font-size: 13px; text-align: center; margin-top: 28px; }

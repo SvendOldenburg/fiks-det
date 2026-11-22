@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0047AB">
+  <meta name="robots" content="noindex">
+  <title>FIKS DET · Oversigt</title>
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Read-only mirror of mom's list: same data, no buttons that change it.
+       For family keeping an eye on things without risking stray taps. -->
+  <div class="view">
+    <header class="page-header">
+      <img class="page-mark" src="icons/icon-192.png" alt="">
+      <div>
+        <h1 class="page-title">FIKS DET</h1>
+        <p class="page-sub">Oversigt · kun visning</p>
+      </div>
+    </header>
+
+    <p id="summary" class="mirror-summary"></p>
+    <div id="task-list" class="task-list"></div>
+
+    <button id="toggle-done" class="link-btn hidden" type="button"></button>
+    <div id="done-list" class="task-list hidden"></div>
+
+    <p id="updated" class="mirror-updated"></p>
+  </div>
+
+  <script type="module" src="js/oversigt.js"></script>
+</body>
+</html>

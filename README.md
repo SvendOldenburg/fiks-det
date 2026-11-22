@@ -93,3 +93,9 @@ python -m http.server 8000
 
 Then `http://localhost:8000`. No `?preview` needed -- there's no auth screen
 to bypass.
+
+## Oversigt (read-only mirror)
+
+`oversigt.html` (svendoldenburg.com/fiks-det/oversigt) shows the same list with
+no buttons that change it, and refreshes itself every minute. For family who
+want to keep an eye on the list without risking stray taps.
